@@ -1,5 +1,7 @@
 # 🍽️ BistroKit
 
+![image](https://github.com/ekino/bistro/assets/1331451/0d9b97b6-2ef1-410b-9c80-55f5647427e2)
+
 **BistroKit** is a CLI tool designed to make your project development as delightful and efficient as a meal at your favorite bistro. Whether you're starting a new project or adding modules to an existing one, BistroKit has everything you need to cook up quality code.
 
 ## ✨ Features
