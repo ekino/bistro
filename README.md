@@ -6,11 +6,11 @@
 
 ## ✨ Features
 
-- **Project Scaffolding**: Easily start projects with frameworks like React, Angular, Next.js, and more. BistroKit sets up the required configurations, dependencies, and architecture.
-- **Automated Configuration**: Quickly set up tools like Jest, webpack, Vite, react-testing-library, linting, and more, ensuring your project is ready to go from the start.
-- **Module Generation**: Automatically generate new pages, components, tests, and more with simple commands.
-- **Customizable Recipes**: Tailor your project setup to your preferences with customizable configurations.
-- **Consistent Structure**: Maintain a clean and organized codebase with standardized project structures.
+-   **Project Scaffolding**: Easily start projects with frameworks like React, Angular, Next.js, and more. BistroKit sets up the required configurations, dependencies, and architecture.
+-   **Automated Configuration**: Quickly set up tools like Jest, webpack, Vite, react-testing-library, linting, and more, ensuring your project is ready to go from the start.
+-   **Module Generation**: Automatically generate new pages, components, tests, and more with simple commands.
+-   **Customizable Recipes**: Tailor your project setup to your preferences with customizable configurations.
+-   **Consistent Structure**: Maintain a clean and organized codebase with standardized project structures.
 
 ## 📦 Installation and Usage
 
@@ -25,10 +25,13 @@ This command will scaffold a new project with the required configurations and de
 For detailed usage instructions, please refer to our wiki page.
 
 ## 🤝 Contributing
+
 We welcome contributions from the community. To contribute, please read our wiki page for guidelines and best practices.
 
 ## 📝 License
+
 BistroKit is licensed under the MIT License.
 
 ## 🌐 Community
+
 Join our growing community of developers who contribute to and benefit from BistroKit’s continuous improvements. Share your ideas, ask questions, and collaborate on projects.
