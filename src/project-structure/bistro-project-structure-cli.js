@@ -1,5 +1,4 @@
 import chalk from 'chalk';
-import fs from 'fs-extra';
 import ora from 'ora';
 import prompts from 'prompts';
 
@@ -37,7 +36,8 @@ export const createProjectStructure = async () => {
     }
 
     // Extract project settings
-    const { isMonorepoProject, frontendFramework } = settings;
+    // frontendFramework
+    const { isMonorepoProject } = settings;
 
     // Start a loading spinner to indicate progress
     const projectStructureSpinner = ora(`Creating your project in progress`).start();
@@ -51,7 +51,7 @@ export const createProjectStructure = async () => {
     }
 
     // TODO: Handle frontendFramework specific logic
-    console.log(frontendFramework);
+    // console.log(frontendFramework);
 
     // Stop the spinner when the project structure creation is complete
     projectStructureSpinner.stop();
