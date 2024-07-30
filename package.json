@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "boot": "node src/BistroCli.js",
+    "boot": "node src/bistro-cli.js",
     "lint": "eslint --config ./eslint.config.js --cache-location ./.eslintcache --cache",
     "lint:fix": "eslint --config ./eslint.config.js --cache-location ./.eslintcache --cache --fix",
     "prettier": "npx prettier src --check",
@@ -20,7 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "chalk": "^5.3.0",
-    "commander": "^12.1.0",
+    "fs-extra": "^11.2.0",
     "ora": "^8.0.1",
     "prompts": "^2.4.2"
   },

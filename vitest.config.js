@@ -4,6 +4,10 @@ import { configDefaults, defineConfig } from 'vitest/config';
 export default defineConfig({
     test: {
         exclude: [...configDefaults.exclude],
-        include: [...configDefaults.include, 'src/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+        include: [
+            ...configDefaults.include,
+            'src/**/*.{test,spec}.?(c|m)[jt]s?(x)',
+            'src/**/*-{test,spec}.?(c|m)[jt]s?(x)',
+        ],
     },
 });
