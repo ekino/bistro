@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildProjectConfig } from './bistro-cli-utils.js';
+import {
+    deleteDirectory,
+    isDirectoryExists,
+    isFileExists,
+    readFileContent,
+} from '../core/FileUtils.js';
+import {
+    buildProjectConfig,
+    createCommonProjectStructure,
+    createMonorepoProjectStructure,
+} from './bistro-cli-utils.js';
 
 describe('Project structure creation', () => {
     it('It should generate an error (project-name empty)', () => {
@@ -231,5 +241,120 @@ describe('Project structure creation', () => {
             sharedUtilsLibProjectPath: null,
         });
         expect(error).toEqual(null);
+    });
+
+    it('It should create common and monorepo project structure', () => {
+        const { settings, error } = buildProjectConfig({
+            'project-name': 'vitality',
+            'project-organization': 'ekino',
+            'project-acronym': 'v6y',
+            'frontend-framework': 'React',
+            'project-monorepo': true,
+            'shared-utils-lib': true,
+            'shared-storybook': true,
+            'shared-ui-lib': true,
+        });
+        expect(error).toEqual(null);
+        createCommonProjectStructure(settings);
+        createMonorepoProjectStructure(settings);
+
+        const { projectRootPath, projectName, projectAcronym } = settings;
+
+        expect(isDirectoryExists(projectRootPath)).toEqual(true);
+        expect(isFileExists(`${projectName}/.gitignore`)).toEqual(true);
+        expect(isFileExists(`${projectName}/package.json`)).toEqual(true);
+
+        expect(
+            readFileContent(`${projectName}/package.json`).includes(
+                'https://gitlab.ekino.com/ekino/v6y/vitality.git',
+            ),
+        ).toEqual(true);
+
+        expect(isDirectoryExists(`${projectRootPath}/${projectAcronym}-front`)).toEqual(true);
+        expect(
+            readFileContent(`${projectRootPath}/${projectAcronym}-front/package.json`).includes(
+                'https://gitlab.ekino.com/ekino/v6y/vitality.git',
+            ),
+        ).toEqual(true);
+        expect(
+            readFileContent(`${projectRootPath}/${projectAcronym}-front/package.json`).includes(
+                '@v6y/front',
+            ),
+        ).toEqual(true);
+
+        expect(isDirectoryExists(`${projectRootPath}/${projectAcronym}-commons`)).toEqual(true);
+        expect(
+            readFileContent(`${projectRootPath}/${projectAcronym}-commons/package.json`).includes(
+                'https://gitlab.ekino.com/ekino/v6y/vitality.git',
+            ),
+        ).toEqual(true);
+        expect(
+            readFileContent(`${projectRootPath}/${projectAcronym}-commons/package.json`).includes(
+                '@v6y/commons',
+            ),
+        ).toEqual(true);
+
+        expect(isDirectoryExists(`${projectRootPath}/${projectAcronym}-storybook`)).toEqual(true);
+        expect(
+            readFileContent(`${projectRootPath}/${projectAcronym}-storybook/package.json`).includes(
+                'https://gitlab.ekino.com/ekino/v6y/vitality.git',
+            ),
+        ).toEqual(true);
+        expect(
+            readFileContent(`${projectRootPath}/${projectAcronym}-storybook/package.json`).includes(
+                '@v6y/storybook',
+            ),
+        ).toEqual(true);
+
+        expect(isDirectoryExists(`${projectRootPath}/${projectAcronym}-ui-commons`)).toEqual(true);
+        expect(
+            readFileContent(
+                `${projectRootPath}/${projectAcronym}-ui-commons/package.json`,
+            ).includes('https://gitlab.ekino.com/ekino/v6y/vitality.git'),
+        ).toEqual(true);
+        expect(
+            readFileContent(
+                `${projectRootPath}/${projectAcronym}-ui-commons/package.json`,
+            ).includes('@v6y/ui-commons'),
+        ).toEqual(true);
+
+        deleteDirectory(projectName);
+        expect(isDirectoryExists(projectRootPath)).toEqual(false);
+    });
+
+    it('It should create common only project structure', () => {
+        const { settings } = buildProjectConfig({
+            'project-name': 'vitality',
+            'project-organization': 'ekino',
+            'project-acronym': 'v6y',
+            'frontend-framework': 'React',
+            'project-monorepo': false,
+            'shared-utils-lib': true,
+            'shared-storybook': true,
+            'shared-ui-lib': true,
+        });
+
+        createCommonProjectStructure(settings);
+        createMonorepoProjectStructure(settings);
+
+        const { projectRootPath, projectName, projectAcronym } = settings;
+
+        expect(isDirectoryExists(projectRootPath)).toEqual(true);
+        expect(isFileExists(`${projectName}/.gitignore`)).toEqual(true);
+        expect(isFileExists(`${projectName}/package.json`)).toEqual(true);
+        expect(isFileExists(`${projectName}/src/package.json`)).toEqual(false);
+        expect(
+            readFileContent(`${projectName}/package.json`).includes(
+                'https://gitlab.ekino.com/ekino/v6y/vitality.git',
+            ),
+        ).toEqual(true);
+
+        expect(isDirectoryExists(`${projectRootPath}/${projectAcronym}-front`)).toEqual(false);
+        expect(isDirectoryExists(`${projectRootPath}/${projectAcronym}-commons`)).toEqual(false);
+        expect(isDirectoryExists(`${projectRootPath}/${projectAcronym}-storybook`)).toEqual(false);
+        expect(isDirectoryExists(`${projectRootPath}/${projectAcronym}-ui-commons`)).toEqual(false);
+
+        deleteDirectory(projectName);
+        expect(isDirectoryExists(projectRootPath)).toEqual(false);
     });
 });

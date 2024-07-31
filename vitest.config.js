@@ -9,5 +9,13 @@ export default defineConfig({
             'src/**/*.{test,spec}.?(c|m)[jt]s?(x)',
             'src/**/*-{test,spec}.?(c|m)[jt]s?(x)',
         ],
+        coverage: {
+            exclude: [
+                ...configDefaults.coverage.exclude,
+                '**/AppLogger.js',
+                '**/bistro-cli.js',
+                '**/bistro-project-structure-cli.js',
+            ],
+        },
     },
 });

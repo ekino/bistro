@@ -131,3 +131,4 @@ dist
 
 # others
 .idea
+*logs

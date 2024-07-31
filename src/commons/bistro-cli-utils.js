@@ -1,4 +1,9 @@
-import fs from 'fs-extra';
+import {
+    copyFiles,
+    createDirectory,
+    readFileContent,
+    writeContentToFile,
+} from '../core/FileUtils.js';
 
 /**
  * Checks if the given configuration represents a monorepo project.
@@ -14,28 +19,6 @@ const templateFrontSourcePath = `${templateRootPath}/front-structure`; // Path t
 const templateFrontPackageJsonPath = `${templateFrontSourcePath}/package.json`; // Path to frontend template package.json
 const templateLibSourcePath = `${templateRootPath}/lib-structure`; // Path to library template files
 const templateLibPackageJsonPath = `${templateLibSourcePath}/package.json`; // Path to library template package.json
-
-/**
- * Copies file(s) or directories from a given source(s) to a specified destination.
- *
- * @param {string | string[]} sources - The path(s) to the file(s) or directory(ies) to be copied. This can be either a single string representing a path or an array of strings representing multiple paths.
- * @param {string} destination - The path to the destination where the files or directories should be copied.
- * @param {object} options - Copying file options
- */
-const copyFiles = (sources, destination, options = {}) => {
-    if (sources) {
-        // Check if sources is defined
-        if (Array.isArray(sources)) {
-            // If it's an array, copy each item
-            for (const source of sources) {
-                fs.copySync(source, destination, options);
-            }
-        } else {
-            // If it's a single string, copy it directly
-            fs.copySync(sources, destination, options);
-        }
-    }
-};
 
 /**
  * Builds the project configuration based on user responses.
@@ -191,16 +174,14 @@ const updatePackageJson = ({
     destinationProjectAcronym,
 }) => {
     // Read the source package.json file
-    const updatedPackageJsonContent = fs
-        .readFileSync(sourcePackageJsonPath)
-        .toString()
+    const updatedPackageJsonContent = readFileContent(sourcePackageJsonPath)
         .replaceAll('project-organization', destinationProjectOrganization)
         .replaceAll('project-name', destinationProjectName)
         .replaceAll('project-acronym', destinationProjectAcronym)
         .replaceAll('project-repo', destinationRepository);
 
     // Write the updated content to the destination package.json
-    fs.writeFileSync(destinationPackageJsonPath, updatedPackageJsonContent);
+    writeContentToFile(destinationPackageJsonPath, updatedPackageJsonContent);
 };
 
 /**
@@ -263,6 +244,7 @@ export const createDestinationStructure = ({
  */
 export const createMonorepoProjectStructure = (settings) => {
     const {
+        isMonorepoProject,
         projectName,
         projectAcronym,
         projectOrganization,
@@ -280,6 +262,10 @@ export const createMonorepoProjectStructure = (settings) => {
         hasSharedStorybook,
         hasSharedUiLib,
     } = settings;
+
+    if (!isMonorepoProject) {
+        return;
+    }
 
     // copy pnpm workspace files
     copyFiles(`${templateRootPath}/pnpm-workspace.yaml`, `./${projectName}/pnpm-workspace.yaml`, {
@@ -348,18 +334,7 @@ export const createCommonProjectStructure = (settings) => {
     } = settings;
 
     // create root project
-    fs.mkdirpSync(projectRootPath, { recursive: true });
-
-    // create frontend module
-    createDestinationStructure({
-        destinationProjectType: 'front',
-        destinationProjectPath: frontendProjectPath,
-        destinationPackageJsonPath: frontendPackageJsonPath,
-        destinationProjectName: `@${projectAcronym}/${frontendProjectName}`,
-        destinationProjectOrganization: projectOrganization,
-        destinationProjectAcronym: projectAcronym,
-        destinationRepository: projectRepository,
-    });
+    createDirectory(projectRootPath, { recursive: true });
 
     // copy commons files
     copyFiles([`${templateRootPath}/.gitignore`], `./${projectName}/.gitignore`, {
@@ -374,5 +349,16 @@ export const createCommonProjectStructure = (settings) => {
         destinationProjectOrganization: projectOrganization,
         destinationRepository: projectRepository,
         destinationProjectAcronym: projectAcronym,
+    });
+
+    // create frontend module
+    createDestinationStructure({
+        destinationProjectType: 'front',
+        destinationProjectPath: frontendProjectPath,
+        destinationPackageJsonPath: frontendPackageJsonPath,
+        destinationProjectName: `@${projectAcronym}/${frontendProjectName}`,
+        destinationProjectOrganization: projectOrganization,
+        destinationProjectAcronym: projectAcronym,
+        destinationRepository: projectRepository,
     });
 };

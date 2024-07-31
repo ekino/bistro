@@ -9,9 +9,11 @@ import {
     createMonorepoProjectStructure,
 } from '../commons/bistro-cli-utils.js';
 import { BistroProjectStructureQuestions } from '../commons/bistro-project-structure-questions.js';
+import AppLogger from '../core/AppLogger.js';
+import { configureAngularApplication } from '../project-angular/bistro-project-angular-cli.js';
+import { configureReactApplication } from '../project-react/bistro-project-react-cli.js';
 
-// eslint-disable-next-line no-console,no-undef
-const log = console.log; // Define log for console output
+const info = AppLogger.info; // Define log for console output
 
 /**
  * Prompts the user for project structure details, builds the configuration, and creates the initial project structure.
@@ -23,7 +25,7 @@ export const createProjectStructure = async () => {
     const responses = await prompts(BistroProjectStructureQuestions);
     if (!responses) {
         // Handle missing responses
-        log(chalk.red('You did not answer required questions!'));
+        info(chalk.red('You did not answer required questions!'));
         throw Error(`You did not answer required questions`);
     }
 
@@ -31,13 +33,13 @@ export const createProjectStructure = async () => {
     const { settings, error } = buildProjectConfig(responses);
     if (error?.length || !settings) {
         // Handle configuration errors
-        log(chalk.red(error || `You did not answer required questions`));
+        info(chalk.red(error || `You did not answer required questions`));
         throw Error(error || `You did not answer required questions`);
     }
 
     // Extract project settings
     // frontendFramework
-    const { isMonorepoProject } = settings;
+    const { isMonorepoProject, frontendFramework } = settings;
 
     // Start a loading spinner to indicate progress
     const projectStructureSpinner = ora(`Creating your project in progress`).start();
@@ -50,8 +52,12 @@ export const createProjectStructure = async () => {
         createMonorepoProjectStructure(settings);
     }
 
-    // TODO: Handle frontendFramework specific logic
-    // console.log(frontendFramework);
+    // configure framework settings
+    if (frontendFramework === 'react') {
+        configureReactApplication(settings);
+    } else if (frontendFramework === 'angular') {
+        configureAngularApplication(settings);
+    }
 
     // Stop the spinner when the project structure creation is complete
     projectStructureSpinner.stop();
