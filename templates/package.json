@@ -1,0 +1,19 @@
+{
+  "name": "project-name",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "author": "project-organization",
+  "description": "Add your description",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.ekino.com/project-organization/project-acronym/project-repo.git"
+  },
+  "scripts": {
+    "build": "build all (to customize)",
+    "lint": "lint all (to customize)",
+    "lint:fix": "lint:fix all (to customize)",
+    "test": "test all (to customize)"
+  },
+  "devDependencies": {}
+}
