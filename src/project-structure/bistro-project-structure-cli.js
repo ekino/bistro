@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import figlet from 'figlet';
 import ora from 'ora';
 import prompts from 'prompts';
 
@@ -21,6 +22,19 @@ const info = AppLogger.info; // Define log for console output
  * @returns {Promise<void>} A Promise that resolves when the project structure is created.
  */
 export const createProjectStructure = async () => {
+    // Display a Welcome Message
+    // eslint-disable-next-line no-console,no-undef
+    console.log(
+        chalk.hex('#880e4f')(
+            figlet.textSync('Welcome to Bistro Kit!', {
+                font: 'ANSI Regular',
+                horizontalLayout: 'default',
+                verticalLayout: 'default',
+                whitespaceBreak: true,
+            }),
+        ),
+    );
+
     // Prompt the user for project details
     const responses = await prompts(BistroProjectStructureQuestions);
     if (!responses) {
@@ -54,9 +68,9 @@ export const createProjectStructure = async () => {
 
     // configure framework settings
     if (frontendFramework === 'react') {
-        configureReactApplication(settings);
+        await configureReactApplication(settings);
     } else if (frontendFramework === 'angular') {
-        configureAngularApplication(settings);
+        await configureAngularApplication(settings);
     }
 
     // Stop the spinner when the project structure creation is complete

@@ -1,0 +1,29 @@
+{
+  "name": "project-name",
+  "version": "0.0.1",
+  "files": [
+    "src",
+    "dist",
+    "README.md"
+  ],
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.ekino.com/project-organization/project-acronym/project-repo.git"
+  },
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {},
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

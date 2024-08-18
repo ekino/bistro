@@ -1,3 +1,5 @@
+import { execSync } from 'child_process';
+
 import {
     copyFiles,
     createDirectory,
@@ -6,22 +8,100 @@ import {
 } from '../core/FileUtils.js';
 
 /**
+ * The root directory of the project.
+ * @type {string}
+ */
+const rootPath = '.';
+
+/**
+ * The directory where project templates are stored.
+ * @type {string}
+ */
+const templateRootPath = './templates';
+
+/**
+ * Contains the paths to the source directories for various frontend frameworks and rendering types.
+ * @type {Object}
+ */
+const frontendSettings = {
+    /**
+     * Source directories for different frontend frameworks and rendering types.
+     * @type {Object}
+     */
+    sourceDir: {
+        /**
+         * Source directories for React projects.
+         * @type {Object}
+         */
+        react: {
+            /**
+             * Path to the template for a React Client-Side Rendered (CSR) project.
+             * @type {string}
+             */
+            csr: `${templateRootPath}/base-react-structure`,
+            /**
+             * Path to the template for a React Server-Side Rendered (SSR) project.
+             * @type {string}
+             */
+            ssr: `${templateRootPath}/base-react-ssr-structure`,
+            /**
+             * Path to the template for a React Static Site Generated (SSG) project.
+             * @type {string}
+             */
+            ssg: `${templateRootPath}/base-react-ssr-structure`,
+        },
+        /**
+         * Source directories for Angular projects.
+         * @type {Object}
+         */
+        angular: {
+            /**
+             * Path to the template for an Angular Client-Side Rendered (CSR) project.
+             * @type {string}
+             */
+            csr: `${templateRootPath}/base-angular-structure`,
+            /**
+             * Path to the template for an Angular Server-Side Rendered (SSR) project.
+             * @type {string}
+             */
+            ssr: `${templateRootPath}/base-angular-ssr-structure`,
+            /**
+             * Path to the template for an Angular Static Site Generated (SSG) project.
+             * @type {string}
+             */
+            ssg: `${templateRootPath}/base-angular-ssr-structure`,
+        },
+    },
+};
+
+/**
+ * Contains settings related to library creation.
+ * @type {Object}
+ */
+const libSettings = {
+    /**
+     * The source directory for library templates
+     * @type {string}
+     */
+    sourceDir: `${templateRootPath}/base-lib-structure`,
+    /**
+     * The path to the package.json file within the library template.
+     * @type {string}
+     */
+    packageJson: `${templateRootPath}/base-lib-structure/package.json`,
+};
+
+/**
  * Checks if the given configuration represents a monorepo project.
+ * This function looks for the specific configuration key 'project-monorepo' to determine if it's a monorepo.
  * @param {Object} config - The project configuration object.
  * @returns {boolean} True if it's a monorepo, false otherwise.
  */
 export const isMonorepo = (config) => config?.[0]?.['project-monorepo'] || false;
 
-// Define constant paths for project templates and files
-const rootPath = '.'; // The root directory of the project
-const templateRootPath = './templates'; // The directory where project templates are stored
-const templateFrontSourcePath = `${templateRootPath}/front-structure`; // Path to frontend template files
-const templateFrontPackageJsonPath = `${templateFrontSourcePath}/package.json`; // Path to frontend template package.json
-const templateLibSourcePath = `${templateRootPath}/lib-structure`; // Path to library template files
-const templateLibPackageJsonPath = `${templateLibSourcePath}/package.json`; // Path to library template package.json
-
 /**
  * Builds the project configuration based on user responses.
+ * This function constructs project paths and settings based on user responses.
  * @param {Object} responses - The user responses from the project setup.
  * @returns {Object} An object containing the project settings or an error message.
  */
@@ -31,6 +111,7 @@ export const buildProjectConfig = (responses) => {
     const projectOrganization = responses['project-organization'];
     const projectAcronym = responses['project-acronym'];
     const frontendFramework = responses['frontend-framework'];
+    const frontendRenderingType = responses['frontend-rendering-type'];
 
     // Check if project details are provided
     if (!projectName?.length) {
@@ -55,6 +136,12 @@ export const buildProjectConfig = (responses) => {
         return {
             settings: null,
             error: 'Project frontend framework is a required information to generate the settings!',
+        };
+    }
+    if (!frontendRenderingType?.length) {
+        return {
+            settings: null,
+            error: 'Frontend Rendering Type is a required information to generate the settings!',
         };
     }
 
@@ -87,6 +174,7 @@ export const buildProjectConfig = (responses) => {
                 frontendProjectPath,
                 frontendPackageJsonPath,
                 frontendFramework,
+                frontendRenderingType,
             },
             error: null,
         };
@@ -124,9 +212,16 @@ export const buildProjectConfig = (responses) => {
         ? `${sharedUiLibProjectPath}/package.json`
         : null;
 
+    // others frontend options
+    const frontendStateManagementFramework = responses['frontend-state-management-framework'];
+    const frontendStylingFramework = responses['frontend-styling-framework'];
+    const frontendE2EFramework = responses['frontend-e2e-framework'];
+    const frontendSchemaValidationFramework = responses['frontend-schema-validation-framework'];
+
     // Return the project configuration object with all paths and settings
     return {
         settings: {
+            isMonorepoProject,
             projectRootPath,
             projectName,
             projectOrganization,
@@ -136,7 +231,11 @@ export const buildProjectConfig = (responses) => {
             frontendProjectPath,
             frontendPackageJsonPath,
             frontendFramework,
-            isMonorepoProject,
+            frontendRenderingType,
+            frontendStateManagementFramework,
+            frontendStylingFramework,
+            frontendE2EFramework,
+            frontendSchemaValidationFramework,
             hasSharedUtilsLib,
             hasSharedStorybook,
             hasSharedUiLib,
@@ -156,9 +255,11 @@ export const buildProjectConfig = (responses) => {
 
 /**
  * Updates a package.json file with project-specific details.
+ * This function replaces placeholders in the package.json with actual project details.
  *
  * @param {Object} options - The configuration options for updating the package.json file.
  * @param {string} options.sourcePackageJsonPath - The path to the source package.json template file.
+ * @param {string} options.destinationProjectPath - The path to the destination project directory.
  * @param {string} options.destinationPackageJsonPath - The path to the destination package.json file.
  * @param {string} options.destinationProjectName - The name of the project.
  * @param {string} options.destinationProjectOrganization - The organization name for the project.
@@ -167,6 +268,7 @@ export const buildProjectConfig = (responses) => {
  */
 const updatePackageJson = ({
     sourcePackageJsonPath,
+    destinationProjectPath,
     destinationPackageJsonPath,
     destinationProjectName,
     destinationProjectOrganization,
@@ -182,12 +284,20 @@ const updatePackageJson = ({
 
     // Write the updated content to the destination package.json
     writeContentToFile(destinationPackageJsonPath, updatedPackageJsonContent);
+
+    // launch pnpm install
+    if (destinationProjectPath?.length) {
+        execSync(`pnpm --prefix=${destinationProjectPath} i`, {
+            stdio: 'inherit',
+        });
+    }
 };
 
 /**
  * Copies template files to the destination project and updates package.json.
  * @param {Object} options - Options for copying files.
- * @param {string} options.destinationProjectType - The type of project ('front' or 'lib').
+ * @param {string} options.destinationFrontendFramework - The frontend framework to use.
+ * @param {string} options.destinationFrontendRenderingType - The frontend rendering type (CSR, SSR, SSG).
  * @param {string} options.destinationProjectPath - The path to the destination project directory.
  * @param {string} options.destinationPackageJsonPath - The path to the destination package.json file.
  * @param {string} options.destinationProjectName - The name of the destination project.
@@ -195,8 +305,9 @@ const updatePackageJson = ({
  * @param {string} options.destinationRepository - The git repository name of the destination project.
  * @param {string} options.destinationProjectAcronym - The acronym of the destination project.
  */
-export const createDestinationStructure = ({
-    destinationProjectType,
+export const createFrontendProjectStructure = ({
+    destinationFrontendFramework,
+    destinationFrontendRenderingType,
     destinationProjectPath,
     destinationPackageJsonPath,
     destinationProjectName,
@@ -205,17 +316,48 @@ export const createDestinationStructure = ({
     destinationProjectAcronym,
 }) => {
     // copy files from template
-    const templateSourcePath =
-        destinationProjectType === 'front' ? templateFrontSourcePath : templateLibSourcePath;
-    copyFiles(templateSourcePath, destinationProjectPath);
+    const templateFrontSourcePath =
+        frontendSettings.sourceDir[destinationFrontendFramework][destinationFrontendRenderingType];
+    copyFiles(templateFrontSourcePath, destinationProjectPath);
 
     // update package json according to user inputs
-    const templatePackageJsonPath =
-        destinationProjectType === 'front'
-            ? templateFrontPackageJsonPath
-            : templateLibPackageJsonPath;
+    const templateFrontPackageJsonPath = `${templateFrontSourcePath}/package.json`; // Path to frontend template package.json
     updatePackageJson({
-        sourcePackageJsonPath: templatePackageJsonPath,
+        sourcePackageJsonPath: templateFrontPackageJsonPath,
+        destinationProjectPath,
+        destinationPackageJsonPath,
+        destinationProjectName,
+        destinationProjectOrganization,
+        destinationRepository,
+        destinationProjectAcronym,
+    });
+};
+
+/**
+ * Copies lib template files to the destination project and updates package.json.
+ * @param {Object} options - Options for copying files.
+ * @param {string} options.destinationProjectPath - The path to the destination project directory.
+ * @param {string} options.destinationPackageJsonPath - The path to the destination package.json file.
+ * @param {string} options.destinationProjectName - The name of the destination project.
+ * @param {string} options.destinationProjectOrganization - The organization of the destination project.
+ * @param {string} options.destinationRepository - The git repository name of the destination project.
+ * @param {string} options.destinationProjectAcronym - The acronym of the destination project.
+ */
+export const createLibDestinationStructure = ({
+    destinationProjectPath,
+    destinationPackageJsonPath,
+    destinationProjectName,
+    destinationProjectOrganization,
+    destinationRepository,
+    destinationProjectAcronym,
+}) => {
+    // copy files from template
+    copyFiles(libSettings.sourceDir, destinationProjectPath);
+
+    // update package json according to user inputs
+    updatePackageJson({
+        sourcePackageJsonPath: libSettings.packageJson,
+        destinationProjectPath,
         destinationPackageJsonPath,
         destinationProjectName,
         destinationProjectOrganization,
@@ -238,7 +380,7 @@ export const createDestinationStructure = ({
  * @param {string} settings.sharedUiLibProjectName - The name of the shared UI library project.
  * @param {string} settings.sharedUiLibProjectPath - The path of the shared UI library project.
  * @param {string} settings.sharedUiLibPackageJsonPath - The path of the package.json file for the shared UI library project.
- * @param {boolean} settings.hasSharedUtilsLib - Indicates whether the project has a shared utilities library.
+ * @param {boolean} settings.hasSharedUtilsLib - Indicates whether the project has a shared utilities' library.
  * @param {boolean} settings.hasSharedStorybook - Indicates whether the project has a shared Storybook.
  * @param {boolean} settings.hasSharedUiLib - Indicates whether the project has a shared UI library.
  */
@@ -274,40 +416,37 @@ export const createMonorepoProjectStructure = (settings) => {
 
     // optional shared utils lib
     if (hasSharedUtilsLib) {
-        createDestinationStructure({
-            destinationProjectType: 'lib',
+        createLibDestinationStructure({
             destinationProjectPath: sharedUtilsLibProjectPath,
             destinationPackageJsonPath: sharedUtilsLibPackageJsonPath,
             destinationProjectName: `@${projectAcronym}/${sharedUtilsLibProjectName}`,
             destinationProjectOrganization: projectOrganization,
-            destinationProjectAcronym: projectAcronym,
             destinationRepository: projectRepository,
+            destinationProjectAcronym: projectAcronym,
         });
     }
 
     // optional shared ui lib
     if (hasSharedUiLib) {
-        createDestinationStructure({
-            destinationProjectType: 'lib',
+        createLibDestinationStructure({
             destinationProjectPath: sharedUiLibProjectPath,
             destinationPackageJsonPath: sharedUiLibPackageJsonPath,
             destinationProjectName: `@${projectAcronym}/${sharedUiLibProjectName}`,
             destinationProjectOrganization: projectOrganization,
-            destinationProjectAcronym: projectAcronym,
             destinationRepository: projectRepository,
+            destinationProjectAcronym: projectAcronym,
         });
     }
 
     // optional shared storybook
     if (hasSharedStorybook) {
-        createDestinationStructure({
-            destinationProjectType: 'lib',
+        createLibDestinationStructure({
             destinationProjectPath: sharedStorybookProjectPath,
             destinationPackageJsonPath: sharedStorybookPackageJsonPath,
             destinationProjectName: `@${projectAcronym}/${sharedStorybookProjectName}`,
             destinationProjectOrganization: projectOrganization,
-            destinationProjectAcronym: projectAcronym,
             destinationRepository: projectRepository,
+            destinationProjectAcronym: projectAcronym,
         });
     }
 };
@@ -331,6 +470,13 @@ export const createCommonProjectStructure = (settings) => {
         frontendProjectName,
         frontendProjectPath,
         frontendPackageJsonPath,
+        frontendFramework,
+        frontendRenderingType,
+
+        // frontendStateManagementFramework,
+        // frontendStylingFramework,
+        // frontendE2EFramework,
+        // frontendSchemaValidationFramework,
     } = settings;
 
     // create root project
@@ -352,8 +498,9 @@ export const createCommonProjectStructure = (settings) => {
     });
 
     // create frontend module
-    createDestinationStructure({
-        destinationProjectType: 'front',
+    createFrontendProjectStructure({
+        destinationFrontendFramework: frontendFramework,
+        destinationFrontendRenderingType: frontendRenderingType,
         destinationProjectPath: frontendProjectPath,
         destinationPackageJsonPath: frontendPackageJsonPath,
         destinationProjectName: `@${projectAcronym}/${frontendProjectName}`,
