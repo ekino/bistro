@@ -1,4 +1,4 @@
-# 🍽️ BistroKit
+# 🍽️ Ekino BistroKit
 
 ![image](https://github.com/ekino/bistro/assets/1331451/0d9b97b6-2ef1-410b-9c80-55f5647427e2)
 
