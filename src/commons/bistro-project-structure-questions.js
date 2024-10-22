@@ -74,18 +74,6 @@ export const BistroProjectStructureQuestions = [
     // optional
     {
         type: 'select',
-        name: 'frontend-state-management-framework',
-        message: 'Which state management solution do you prefer for your frontend?',
-        choices: [
-            { title: 'None', value: 'none' },
-            { title: 'TanStack Query (for data fetching and caching)', value: 'tanStack-query' },
-            { title: 'Zustand (lightweight state management)', value: 'zustand' },
-            { title: 'Redux Toolkit (RTK Query included)', value: 'rtk-query' },
-        ],
-        initial: 0,
-    },
-    {
-        type: 'select',
         name: 'frontend-styling-framework',
         message: 'Which styling approach will you use for your frontend?',
         choices: [
@@ -100,12 +88,13 @@ export const BistroProjectStructureQuestions = [
     },
     {
         type: 'select',
-        name: 'frontend-e2e-framework',
-        message: 'Which end-to-end (E2E) testing framework will you use?',
+        name: 'frontend-state-management-framework',
+        message: 'Which state management solution do you prefer for your frontend?',
         choices: [
             { title: 'None', value: 'none' },
-            { title: 'Cypress', value: 'cypress' },
-            { title: 'Playwright', value: 'playwright' },
+            { title: 'TanStack Query (for data fetching and caching)', value: 'tanStack-query' },
+            { title: 'Zustand (lightweight state management)', value: 'zustand' },
+            { title: 'Redux Toolkit (RTK Query included)', value: 'rtk-query' },
         ],
         initial: 0,
     },
@@ -117,6 +106,17 @@ export const BistroProjectStructureQuestions = [
             { title: 'None', value: 'none' },
             { title: 'Zod', value: 'zod' },
             { title: 'Yup', value: 'yup' },
+        ],
+        initial: 0,
+    },
+    {
+        type: 'select',
+        name: 'frontend-e2e-framework',
+        message: 'Which end-to-end (E2E) testing framework will you use?',
+        choices: [
+            { title: 'None', value: 'none' },
+            { title: 'Cypress', value: 'cypress' },
+            { title: 'Playwright', value: 'playwright' },
         ],
         initial: 0,
     },

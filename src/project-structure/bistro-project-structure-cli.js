@@ -3,9 +3,8 @@ import figlet from 'figlet';
 import ora from 'ora';
 import prompts from 'prompts';
 
-// For interactive user prompts
+import { buildProjectSettings } from '../commons/bistro-cli-settings.js';
 import {
-    buildProjectConfig,
     createCommonProjectStructure,
     createMonorepoProjectStructure,
 } from '../commons/bistro-cli-utils.js';
@@ -44,7 +43,7 @@ export const createProjectStructure = async () => {
     }
 
     // Parse and validate user settings
-    const { settings, error } = buildProjectConfig(responses);
+    const { settings, error } = buildProjectSettings(responses);
     if (error?.length || !settings) {
         // Handle configuration errors
         info(chalk.red(error || `You did not answer required questions`));

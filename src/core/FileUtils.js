@@ -1,6 +1,25 @@
 import fs from 'fs-extra';
 
 /**
+ * Checks if a directory exists at the given path.
+ *
+ * @param {string} dirPath - The path of the directory to check.
+ * @returns {boolean} True if the directory exists, false otherwise.
+ */
+export const isDirectoryExists = (dirPath) => {
+    return fs.pathExistsSync(dirPath);
+};
+
+/**
+ * Check if a file exists at the given path.
+ * @param filePath
+ * @returns {*}
+ */
+export const isFileExists = (filePath) => {
+    return fs.pathExistsSync(filePath);
+};
+
+/**
  * Copies file(s) or directories from a given source(s) to a specified destination.
  *
  * @param {string | string[]} sources - The path(s) to the file(s) or directory(ies) to be copied. This can be either a single string representing a path or an array of strings representing multiple paths.
@@ -39,6 +58,9 @@ export const createDirectory = (dirPath, options = {}) => {
  * @param {string} content - The content to be written to the file.
  */
 export const writeContentToFile = (filePath, content) => {
+    if (!isFileExists(filePath)) {
+        return;
+    }
     fs.writeFileSync(filePath, content);
 };
 
@@ -49,6 +71,9 @@ export const writeContentToFile = (filePath, content) => {
  * @returns {string} The content of the file as a string.
  */
 export const readFileContent = (filePath) => {
+    if (!isFileExists(filePath)) {
+        return '';
+    }
     return fs.readFileSync(filePath)?.toString();
 };
 
@@ -58,19 +83,20 @@ export const readFileContent = (filePath) => {
  * @param {string} dirPath - The path of the directory to delete.
  */
 export const deleteDirectory = (dirPath) => {
+    if (!isDirectoryExists(dirPath)) {
+        return;
+    }
     fs.removeSync(dirPath);
 };
 
 /**
- * Checks if a directory exists at the given path.
+ * Deletes a file at the specified path
  *
- * @param {string} dirPath - The path of the directory to check.
- * @returns {boolean} True if the directory exists, false otherwise.
+ * @param {string} filePath - The path of the file to delete.
  */
-export const isDirectoryExists = (dirPath) => {
-    return fs.pathExistsSync(dirPath);
-};
-
-export const isFileExists = (filePath) => {
-    return fs.pathExistsSync(filePath);
+export const deleteFile = (filePath) => {
+    if (!isFileExists(filePath)) {
+        return;
+    }
+    fs.removeSync(filePath);
 };
