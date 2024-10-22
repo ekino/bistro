@@ -1,10 +1,10 @@
 import chalk from 'chalk';
+import figlet from 'figlet';
 import ora from 'ora';
 import prompts from 'prompts';
 
-// For interactive user prompts
+import { buildProjectSettings } from '../commons/bistro-cli-settings.js';
 import {
-    buildProjectConfig,
     createCommonProjectStructure,
     createMonorepoProjectStructure,
 } from '../commons/bistro-cli-utils.js';
@@ -21,6 +21,19 @@ const info = AppLogger.info; // Define log for console output
  * @returns {Promise<void>} A Promise that resolves when the project structure is created.
  */
 export const createProjectStructure = async () => {
+    // Display a Welcome Message
+    // eslint-disable-next-line no-console,no-undef
+    console.log(
+        chalk.hex('#880e4f')(
+            figlet.textSync('Welcome to Bistro Kit!', {
+                font: 'ANSI Regular',
+                horizontalLayout: 'default',
+                verticalLayout: 'default',
+                whitespaceBreak: true,
+            }),
+        ),
+    );
+
     // Prompt the user for project details
     const responses = await prompts(BistroProjectStructureQuestions);
     if (!responses) {
@@ -30,7 +43,7 @@ export const createProjectStructure = async () => {
     }
 
     // Parse and validate user settings
-    const { settings, error } = buildProjectConfig(responses);
+    const { settings, error } = buildProjectSettings(responses);
     if (error?.length || !settings) {
         // Handle configuration errors
         info(chalk.red(error || `You did not answer required questions`));
@@ -54,9 +67,17 @@ export const createProjectStructure = async () => {
 
     // configure framework settings
     if (frontendFramework === 'react') {
-        configureReactApplication(settings);
+        await configureReactApplication({
+            ...settings,
+            logger: info,
+            loggerFormatter: chalk,
+        });
     } else if (frontendFramework === 'angular') {
-        configureAngularApplication(settings);
+        await configureAngularApplication({
+            ...settings,
+            logger: info,
+            loggerFormatter: chalk,
+        });
     }
 
     // Stop the spinner when the project structure creation is complete
