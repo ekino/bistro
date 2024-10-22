@@ -68,9 +68,17 @@ export const createProjectStructure = async () => {
 
     // configure framework settings
     if (frontendFramework === 'react') {
-        await configureReactApplication(settings);
+        await configureReactApplication({
+            ...settings,
+            logger: info,
+            loggerFormatter: chalk,
+        });
     } else if (frontendFramework === 'angular') {
-        await configureAngularApplication(settings);
+        await configureAngularApplication({
+            ...settings,
+            logger: info,
+            loggerFormatter: chalk,
+        });
     }
 
     // Stop the spinner when the project structure creation is complete

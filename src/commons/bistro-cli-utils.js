@@ -100,50 +100,17 @@ const libSettings = {
 export const isMonorepo = (config) => config?.[0]?.['project-monorepo'] || false;
 
 /**
- * Builds the project configuration based on user responses.
- * This function constructs project paths and settings based on user responses.
- * @param {Object} responses - The user responses from the project setup.
- * @returns {Object} An object containing the project settings or an error message.
+ * Build Common Settings
+ * @param responses
+ * @returns {{frontendStylingFramework, frontendProjectPath: string, frontendPackageJsonPath: string, isMonorepoProject: boolean, frontendStateManagementFramework, projectRootPath: string, frontendE2EFramework, frontendFramework: string, frontendRenderingType, projectAcronym: string, frontendSchemaValidationFramework, projectName: string, projectOrganization: string, projectRepository: string, frontendProjectName: (string)}}
  */
-export const buildProjectConfig = (responses) => {
+const buildCommonSettings = (responses) => {
     // Extract project name, organization, and acronym from user responses
     const projectName = responses['project-name'];
     const projectOrganization = responses['project-organization'];
     const projectAcronym = responses['project-acronym'];
     const frontendFramework = responses['frontend-framework'];
     const frontendRenderingType = responses['frontend-rendering-type'];
-
-    // Check if project details are provided
-    if (!projectName?.length) {
-        return {
-            settings: null,
-            error: 'Project name is a required information to generate your git project!',
-        };
-    }
-    if (!projectOrganization?.length) {
-        return {
-            settings: null,
-            error: 'Project organization is a required information to generate your git project!',
-        };
-    }
-    if (!projectAcronym?.length) {
-        return {
-            settings: null,
-            error: 'Project acronym is a required information to generate your git project!',
-        };
-    }
-    if (!frontendFramework?.length) {
-        return {
-            settings: null,
-            error: 'Project frontend framework is a required information to generate the settings!',
-        };
-    }
-    if (!frontendRenderingType?.length) {
-        return {
-            settings: null,
-            error: 'Frontend Rendering Type is a required information to generate the settings!',
-        };
-    }
 
     // verify if user want to create monorepo
     const isMonorepoProject = responses['project-monorepo'];
@@ -161,33 +128,50 @@ export const buildProjectConfig = (responses) => {
     const frontendProjectName = isMonorepoProject ? 'front' : projectName;
     const frontendPackageJsonPath = `${frontendProjectPath}/package.json`;
 
-    if (!isMonorepoProject) {
-        return {
-            settings: {
-                isMonorepoProject,
-                projectRootPath,
-                projectName,
-                projectOrganization,
-                projectAcronym,
-                projectRepository,
-                frontendProjectName,
-                frontendProjectPath,
-                frontendPackageJsonPath,
-                frontendFramework,
-                frontendRenderingType,
-            },
-            error: null,
-        };
+    // others frontend options
+    const frontendStateManagementFramework = responses['frontend-state-management-framework'];
+    const frontendStylingFramework = responses['frontend-styling-framework'];
+    const frontendE2EFramework = responses['frontend-e2e-framework'];
+    const frontendSchemaValidationFramework = responses['frontend-schema-validation-framework'];
+
+    return {
+        isMonorepoProject,
+        projectRootPath,
+        projectName,
+        projectOrganization,
+        projectAcronym,
+        projectRepository,
+        frontendProjectName,
+        frontendProjectPath,
+        frontendPackageJsonPath,
+        frontendFramework,
+        frontendRenderingType,
+        frontendStateManagementFramework,
+        frontendStylingFramework,
+        frontendE2EFramework,
+        frontendSchemaValidationFramework,
+    };
+};
+
+/**
+ * Build monorepo settings
+ * @param responses
+ * @param commonSettings
+ * @returns {{hasSharedUtilsLib: boolean, sharedUtilsLibProjectName: string, hasSharedStorybook: boolean, sharedStorybookProjectName: string, sharedUiLibProjectPath: string, hasSharedUiLib: boolean, sharedUtilsLibPackageJsonPath: string, sharedStorybookProjectPath: string, sharedStorybookPackageJsonPath: string, sharedUiLibPackageJsonPath: string, sharedUtilsLibProjectPath: string, sharedUiLibProjectName: string}|{}}
+ */
+const buildMonorepoSettings = (responses, commonSettings) => {
+    if (!commonSettings?.isMonorepoProject) {
+        return {};
     }
 
     // optional settings
-    const hasSharedUtilsLib = (isMonorepoProject && responses['shared-utils-lib']) || false;
-    const hasSharedStorybook = (isMonorepoProject && responses['shared-storybook']) || false;
-    const hasSharedUiLib = (isMonorepoProject && responses['shared-ui-lib']) || false;
+    const hasSharedUtilsLib = responses['shared-utils-lib'] || false;
+    const hasSharedStorybook = responses['shared-storybook'] || false;
+    const hasSharedUiLib = responses['shared-ui-lib'] || false;
 
     // shared utils lib settings
     const sharedUtilsLibProjectPath = hasSharedUtilsLib
-        ? `${projectRootPath}/${projectAcronym}-commons`
+        ? `${commonSettings?.projectRootPath}/${commonSettings?.projectAcronym}-commons`
         : null;
     const sharedUtilsLibProjectName = hasSharedUtilsLib ? 'commons' : null;
     const sharedUtilsLibPackageJsonPath = hasSharedUtilsLib
@@ -196,7 +180,7 @@ export const buildProjectConfig = (responses) => {
 
     // storybook settings
     const sharedStorybookProjectPath = hasSharedStorybook
-        ? `${projectRootPath}/${projectAcronym}-storybook`
+        ? `${commonSettings?.projectRootPath}/${commonSettings?.projectAcronym}-storybook`
         : null;
     const sharedStorybookProjectName = hasSharedStorybook ? 'storybook' : null;
     const sharedStorybookPackageJsonPath = hasSharedStorybook
@@ -205,49 +189,85 @@ export const buildProjectConfig = (responses) => {
 
     // shared ui lib settings
     const sharedUiLibProjectPath = hasSharedUiLib
-        ? `${projectRootPath}/${projectAcronym}-ui-commons`
+        ? `${commonSettings?.projectRootPath}/${commonSettings?.projectAcronym}-ui-commons`
         : null;
     const sharedUiLibProjectName = hasSharedUiLib ? 'ui-commons' : null;
     const sharedUiLibPackageJsonPath = hasSharedUiLib
         ? `${sharedUiLibProjectPath}/package.json`
         : null;
 
-    // others frontend options
-    const frontendStateManagementFramework = responses['frontend-state-management-framework'];
-    const frontendStylingFramework = responses['frontend-styling-framework'];
-    const frontendE2EFramework = responses['frontend-e2e-framework'];
-    const frontendSchemaValidationFramework = responses['frontend-schema-validation-framework'];
+    return {
+        hasSharedUtilsLib,
+        hasSharedStorybook,
+        hasSharedUiLib,
+        sharedUtilsLibProjectName,
+        sharedUtilsLibProjectPath,
+        sharedUtilsLibPackageJsonPath,
+        sharedStorybookProjectName,
+        sharedStorybookProjectPath,
+        sharedStorybookPackageJsonPath,
+        sharedUiLibProjectName,
+        sharedUiLibProjectPath,
+        sharedUiLibPackageJsonPath,
+    };
+};
 
-    // Return the project configuration object with all paths and settings
+/**
+ * Builds the project configuration based on user responses.
+ * This function constructs project paths and settings based on user responses.
+ * @param {Object} responses - The user responses from the project setup.
+ * @returns {Object} An object containing the project settings or an error message.
+ */
+export const buildProjectConfig = (responses) => {
+    const commonSettings = buildCommonSettings(responses);
+
+    // Check if project details are provided
+    if (!commonSettings?.projectName?.length) {
+        return {
+            settings: null,
+            error: 'Project name is a required information to generate your git project!',
+        };
+    }
+    if (!commonSettings?.projectOrganization?.length) {
+        return {
+            settings: null,
+            error: 'Project organization is a required information to generate your git project!',
+        };
+    }
+    if (!commonSettings?.projectAcronym?.length) {
+        return {
+            settings: null,
+            error: 'Project acronym is a required information to generate your git project!',
+        };
+    }
+    if (!commonSettings?.frontendFramework?.length) {
+        return {
+            settings: null,
+            error: 'Project frontend framework is a required information to generate the settings!',
+        };
+    }
+    if (!commonSettings?.frontendRenderingType?.length) {
+        return {
+            settings: null,
+            error: 'Frontend Rendering Type is a required information to generate the settings!',
+        };
+    }
+
+    // Returns simple project configuration
+    if (!commonSettings?.isMonorepoProject) {
+        return {
+            settings: {
+                ...commonSettings,
+            },
+            error: null,
+        };
+    }
+
+    // Returns monorepo project configuration
     return {
         settings: {
-            isMonorepoProject,
-            projectRootPath,
-            projectName,
-            projectOrganization,
-            projectAcronym,
-            projectRepository,
-            frontendProjectName,
-            frontendProjectPath,
-            frontendPackageJsonPath,
-            frontendFramework,
-            frontendRenderingType,
-            frontendStateManagementFramework,
-            frontendStylingFramework,
-            frontendE2EFramework,
-            frontendSchemaValidationFramework,
-            hasSharedUtilsLib,
-            hasSharedStorybook,
-            hasSharedUiLib,
-            sharedUtilsLibProjectName,
-            sharedUtilsLibProjectPath,
-            sharedUtilsLibPackageJsonPath,
-            sharedStorybookProjectName,
-            sharedStorybookProjectPath,
-            sharedStorybookPackageJsonPath,
-            sharedUiLibProjectName,
-            sharedUiLibProjectPath,
-            sharedUiLibPackageJsonPath,
+            ...commonSettings,
+            ...buildMonorepoSettings(responses, commonSettings),
         },
         error: null,
     };
@@ -368,7 +388,7 @@ export const createLibDestinationStructure = ({
 
 /**
  * Creates the structure for a monorepo project by conditionally copying files for shared libraries.
- * @param {Object} settings - The project settings object.
+ * @param {*|{frontendStylingFramework, frontendProjectPath: string, frontendPackageJsonPath: string, isMonorepoProject: boolean, frontendStateManagementFramework, projectRootPath: string, frontendE2EFramework, frontendFramework: string, frontendRenderingType, projectAcronym: string, frontendSchemaValidationFramework, projectName: string, projectOrganization: string, projectRepository: string, frontendProjectName: string}|{frontendStylingFramework, frontendProjectPath: string, frontendPackageJsonPath: string, isMonorepoProject: boolean, frontendStateManagementFramework, projectRootPath: string, frontendE2EFramework, frontendFramework: string, frontendRenderingType, projectAcronym: string, frontendSchemaValidationFramework, projectName: string, projectOrganization: string, projectRepository: string, frontendProjectName: string}} settings - The project settings object.
  * @param {string} settings.projectOrganization - The project organization name.
  * @param {string} settings.projectAcronym - The project acronym.
  * @param {string} settings.sharedUtilsLibProjectName - The name of the shared utilities library project.
@@ -472,11 +492,6 @@ export const createCommonProjectStructure = (settings) => {
         frontendPackageJsonPath,
         frontendFramework,
         frontendRenderingType,
-
-        // frontendStateManagementFramework,
-        // frontendStylingFramework,
-        // frontendE2EFramework,
-        // frontendSchemaValidationFramework,
     } = settings;
 
     // create root project
