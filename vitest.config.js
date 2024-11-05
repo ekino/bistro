@@ -3,7 +3,7 @@ import { configDefaults, defineConfig } from 'vitest/config';
 // https://vitest.dev/config/
 export default defineConfig({
     test: {
-        exclude: [...configDefaults.exclude],
+        exclude: [...configDefaults.exclude, 'templates/**'],
         include: [
             ...configDefaults.include,
             'src/**/*.{test,spec}.?(c|m)[jt]s?(x)',

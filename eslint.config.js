@@ -4,7 +4,7 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 export default [
     // global ignores
     {
-        ignores: ['dist/**', 'node_modules/**', 'bin/**', 'build/**'],
+        ignores: ['templates/**', 'dist/**', 'node_modules/**', 'bin/**', 'build/**'],
     },
     pluginJs.configs.recommended,
     {
