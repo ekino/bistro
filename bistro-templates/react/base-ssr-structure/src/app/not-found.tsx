@@ -5,7 +5,7 @@ export default function NotFound() {
         <div>
             <h2>Not Found</h2>
             <p>Could not find requested resource</p>
-            <Link href="/templates/react/base-ssr-structure/public">Return Home</Link>
+            <Link href="/bistro-templates/react/base-ssr-structure/public">Return Home</Link>
         </div>
     );
 }

@@ -1,18 +1,30 @@
-import pluginJs from '@eslint/js';
-import eslintConfigPrettier from 'eslint-config-prettier';
+import eslint from '@eslint/js';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import globals from 'globals';
 
 export default [
-    // global ignores
+    eslint.configs.recommended,
     {
-        ignores: ['templates/**', 'dist/**', 'node_modules/**', 'bin/**', 'build/**'],
-    },
-    pluginJs.configs.recommended,
-    {
-        files: ['src/**/*.js'],
+        files: ['src/**/*.js', 'src/**/*.mjs', 'src/**/*.tsx', 'src/**/*.ts'],
         rules: {
-            ...pluginJs.configs.recommended.rules,
-            'no-console': 'error',
+            'max-depth': ['error', 3],
+            'max-nested-callbacks': ['error', 3],
+            'max-params': ['error', 3],
+            'max-lines': ['error', 1000], // per file
+            'max-lines-per-function': ['error', 200], // per function
+            'max-statements': ['error', 50], // per function
         },
     },
-    eslintConfigPrettier,
+    eslintPluginPrettierRecommended,
+    {
+        languageOptions: {
+            globals: {
+                ...globals.browser,
+                ...globals.node,
+            },
+        },
+    },
+    {
+        ignores: ['**/*.test.js', '*.d.ts', '**/*.d.ts', 'dist/**'],
+    },
 ];

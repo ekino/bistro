@@ -1,5 +1,5 @@
 export const configureSharedLib = (settings) => {
-    const { logger, loggerFormatter, hasSharedUtilsLib } = settings;
+    const { hasSharedUtilsLib } = settings;
 
     if (!hasSharedUtilsLib) {
         return;

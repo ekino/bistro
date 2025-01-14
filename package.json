@@ -2,14 +2,14 @@
   "name": "bistro",
   "version": "1.0.0",
   "description": "",
-  "main": "src/bistro-cli.js",
+  "main": "bistro-cli/bistro-cli.js",
   "type": "module",
   "scripts": {
-    "boot": "node src/bistro-cli.js",
+    "boot": "node bistro-cli/bistro-cli.js",
     "lint": "eslint --config ./eslint.config.js --cache-location ./.eslintcache --cache",
     "lint:fix": "eslint --config ./eslint.config.js --cache-location ./.eslintcache --cache --fix",
-    "prettier": "npx prettier src --check",
-    "prettier:fix": "npm run prettier src -- --write",
+    "prettier": "npx prettier bistro-cli --check",
+    "prettier:fix": "npm run prettier bistro-cli -- --write",
     "test": "vitest --config ./vitest.config.js --coverage --watch false",
     "test:watch": "vitest --config ./vitest.config.js",
     "test:ui": "vitest --config ./vitest.config.js --ui",
@@ -19,30 +19,30 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "bistro": "src/bistro-cli.js"
+    "bistro": "bistro-cli/bistro-cli.js"
   },
   "dependencies": {
-    "chalk": "^5.3.0",
-    "figlet": "^1.7.0",
-    "fs-extra": "^11.2.0",
-    "ora": "^8.0.1",
-    "prompts": "^2.4.2",
-    "shelljs": "^0.8.5",
-    "winston": "^3.5.1",
-    "winston-daily-rotate-file": "^4.6.0",
-    "winston-transport": "^4.5.0"
+    "chalk": "=5.4.1",
+    "figlet": "=1.8.0",
+    "fs-extra": "=11.2.0",
+    "ora": "=8.1.1",
+    "prompts": "=2.4.2",
+    "shelljs": "=0.8.5",
+    "winston": "=3.17.0",
+    "winston-daily-rotate-file": "=5.0.0",
+    "winston-transport": "=4.9.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.1.0",
-    "@eslint/js": "^9.8.0",
-    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@vitest/coverage-v8": "^2.0.5",
-    "@vitest/ui": "^2.0.5",
-    "eslint": "^9.8.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "husky": "^9.1.4",
-    "prettier": "^3.3.3",
-    "vitest": "^2.0.5"
+    "@eslint/js": "=9.18.0",
+    "@trivago/prettier-plugin-sort-imports": "=5.2.1",
+    "@vitest/coverage-v8": "=2.1.8",
+    "@vitest/ui": "=2.1.8",
+    "eslint": "=9.18.0",
+    "eslint-config-prettier": "=10.0.1",
+    "eslint-plugin-prettier": "=5.2.1",
+    "globals": "=15.14.0",
+    "husky": "=9.1.7",
+    "prettier": "=3.4.2",
+    "vitest": "=2.1.8"
   }
 }

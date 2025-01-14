@@ -11,7 +11,7 @@ const config = {
     singleQuote: true,
     printWidth: 100,
     plugins: [PrettierImportConfig],
-    importOrder: ['^@ui/(.*)$', '^@server/(.*)$', '^[./]'],
+    importOrder: ['=@ui/(.*)$', '=@server/(.*)$', '=[./]'],
     importOrderSeparation: true,
     importOrderSortSpecifiers: true,
 };
